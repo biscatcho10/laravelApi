@@ -1,6 +1,7 @@
 <?php
 
 use Illuminate\Http\Request;
+use Illuminate\Routing\RouteGroup;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -14,6 +15,16 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
-Route::middleware('auth:api')->get('/user', function (Request $request) {
-    return $request->user();
+Route::post('register', 'Auth\AuthController@register');
+Route::post('login', 'Auth\AuthController@login');
+
+Route::group(['middleware' => 'jwt.auth'], function () {
+    Route::group(['namespace' => 'Auth'], function () {
+        Route::get('logout', 'AuthController@logout');
+        Route::get('user', 'AuthController@getAuthUser');
+    });
+
+    Route::group(['namespace' => 'API'], function () {
+        Route::resource('books', 'BookController');
+    });
 });
